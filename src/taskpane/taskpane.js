@@ -12,6 +12,9 @@ Office.onReady((info) => {
     document.getElementById("insert-paragraph").onclick = () => tryCatch(insertParagraph);
     document.getElementById("get-characters").onclick = () => tryCatch(getCharacters);
     document.getElementById("get-speaker").onclick = () => tryCatch(getSpeaker);
+    document.getElementById("insert-content-control").onclick = () => tryCatch(insertContentControl);
+    document.getElementById("get-content-control").onclick = () => tryCatch(getContentControl);
+    
 /*     document.getElementById("apply-style").onclick = () => tryCatch(applyStyle);
     document.getElementById("apply-custom-style").onclick = () => tryCatch(applyCustomStyle);
     document.getElementById("change-font").onclick = () => tryCatch(changeFont);
@@ -226,7 +229,7 @@ async function getSpeakerName(){
         if (thisPara.style == "Speaker"){
             thisPara.select();
             var charName = thisPara.text;
-            console.log("The selected para uses the Speaker style." + charName);
+            // console.log("The selected para uses the Speaker style." + charName);
             return charName;
         }
         else {
@@ -236,11 +239,11 @@ async function getSpeakerName(){
                 thisPara.load("text, style");
                 await context.sync();
                 if(thisPara.isNullObject){
-                    console.log("No previous paragraph uses the Speaker style.")
+                    // console.log("No previous paragraph uses the Speaker style.")
                     return "Nobody";
                 } 
                 if(thisPara.style == "Speaker"){
-                    console.log("Found a Speaker style. The text is " + thisPara.text);
+                    // console.log("Found a Speaker style. The text is " + thisPara.text);
                     return thisPara.text;
                 }
             }
@@ -249,8 +252,66 @@ async function getSpeakerName(){
 }
 
 async function getSpeaker() {
-    debugger;
-    console.log("In getSpeaker -- about to await getSpeakerName.")
+    // debugger;
+    // console.log("In getSpeaker -- about to await getSpeakerName.")
     const speakerName = await getSpeakerName();
-    console.log("The speaker's name is " + speakerName);
+    // console.log("The speaker's name is " + speakerName);
+}
+
+
+async function insertContentControl() {
+    await Word.run(async (context) => {
+        const doc = context.document;
+        const originalRange = doc.getSelection();
+        const contentControl = originalRange.insertContentControl("PlainText");
+        contentControl.appearance = "Tags";
+        // Customize the properties of the new content control (optional)
+           /* contentControl.title = "MyCustomControl";
+            contentControl.tag = "unique_tag_123";
+            contentControl.placeholderText = "Enter information here";
+            contentControl.cannotDelete = false; */
+        await context.sync();
+    });
+}
+
+async function getContentControl () {
+    await Word.run(async (context) => {
+        var contentControl = await SelectedContentControl();
+        var speakerName = await  getSpeakerName();
+        if(contentControl){
+            console.log ("Selected content control ID is " + contentControl.id + " with text: " + contentControl.text);
+            console.log ("The speaker who is moving is: " + speakerName);
+        }
+        else {
+            console.log ("No content control selected.");
+        }
+    });
+}
+
+async function SelectedContentControl() {
+    return await Word.run(async (context) => {
+        const doc = context.document;
+        const selectedRange = doc.getSelection();
+        // Get the parent content control of the selection. 
+        // Use the *OrNullObject method, which returns an object with isNullObject
+        // property set to true if no parent CC exists, instead of throwing an error.
+        const parentContentControl = selectedRange.parentContentControlOrNullObject;
+        // Load the 'id' or any other property of the parentContentControl to check its existence
+    // 'id' is a good property because every content control has one.
+    parentContentControl.load('id, text');
+
+    // Synchronize the document state by executing the queued commands
+    await context.sync();
+
+    // Check if the isNullObject property is true
+    if (parentContentControl.isNullObject) {
+        console.log("The selection is not in a content control.");
+        return null;
+        // Perform actions when the selection is outside a content control
+    } else {
+        console.log(`The selection is inside content control with ID: ${parentContentControl.id}`);
+        // Perform actions when the selection is inside a content control
+        return parentContentControl;
+    }
+    });
 }

@@ -9,7 +9,8 @@ import { base64Image } from "../../base64Image";
 Office.onReady((info) => {
   if (info.host === Office.HostType.Word) {
     // Assign event handlers and other initialization logic.
-    document.getElementById("insert-paragraph").onclick = () => tryCatch(insertParagraph);
+    // document.getElementById("insert-paragraph").onclick = () => tryCatch(insertParagraph);
+    document.getElementById("open-stage-window").onclick = () => tryCatch(openStageWindow);
     document.getElementById("get-characters").onclick = () => tryCatch(getCharacters);
     document.getElementById("get-speaker").onclick = () => tryCatch(getSpeaker);
     document.getElementById("insert-content-control").onclick = () => tryCatch(insertContentControl);
@@ -313,5 +314,34 @@ async function SelectedContentControl() {
         // Perform actions when the selection is inside a content control
         return parentContentControl;
     }
+    });
+}
+
+let stageWindow;
+
+/* function openStageWindow() {
+  Office.context.ui.displayDialogAsync(
+    "https://localhost:3000/stagewindow.html", // URL of the page to open in the dialog
+    { height: 50, width: 50 }, // Options for size (percentage of the current window)
+    (asyncResult) => {
+      if (asyncResult.status === Office.AsyncResultStatus.Failed) {
+        console.log(asyncResult.error.code + ": " + asyncResult.error.message);
+      } else {
+        stageWindow = asyncResult.value;
+        // Add event handlers, e.g., for messages or closure events
+        stageWindow.addEventHandler(Office.EventType.DialogMessageReceived, processMessage);
+      }
+    }
+  );
+} */
+
+function openStageWindow() {
+    Office.context.ui.displayDialogAsync("https://localhost:3000/stagewindow.html", { height: 30, width: 20 },
+    (asyncResult) => {
+        const dialog = asyncResult.value;
+        dialog.addEventHandler(Office.EventType.DialogMessageReceived, (arg) => {
+            dialog.close();
+            // Do something to process the message.
+        });
     });
 }

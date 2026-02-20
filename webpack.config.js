@@ -56,6 +56,11 @@ module.exports = async (env, options) => {
         template: "./src/taskpane/taskpane.html",
         chunks: ["polyfill", "taskpane"],
       }),
+      new HtmlWebpackPlugin({
+        filename: "stagewindow.html",
+        template: "./src/taskpane/stagewindow.html",
+        chunks: ["polyfill", "stagewindow"],
+      }),
       new CopyWebpackPlugin({
         patterns: [
           {

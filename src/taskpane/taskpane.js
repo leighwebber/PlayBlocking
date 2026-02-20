@@ -11,6 +11,7 @@ Office.onReady((info) => {
     // Assign event handlers and other initialization logic.
     document.getElementById("insert-paragraph").onclick = () => tryCatch(insertParagraph);
     document.getElementById("get-characters").onclick = () => tryCatch(getCharacters);
+    document.getElementById("get-speaker").onclick = () => tryCatch(getSpeaker);
 /*     document.getElementById("apply-style").onclick = () => tryCatch(applyStyle);
     document.getElementById("apply-custom-style").onclick = () => tryCatch(applyCustomStyle);
     document.getElementById("change-font").onclick = () => tryCatch(changeFont);
@@ -210,4 +211,46 @@ async function replaceContentInControl() {
         // TODO1: Queue commands to replace the text in the Service Name
         //        content control.
         const serviceNameContentControl = context.document.contentControls.getByTag("serviceName").getFirst();
-        serviceNameContentControl.insertText("Fabrikam Online Productivity Suite", Word.InsertLocation.r
+        serviceNameContentControl.insertText("Fabrikam Online Productivity Suite", Word.InsertLocation.replace);
+        await context.sync();
+    });
+}
+
+async function getSpeakerName(){
+    await Word.run(async (context) => {
+        const doc = context.document;
+        const originalRange = doc.getSelection();
+        originalRange.load("paragraphs, style");
+        await context.sync();
+        var thisPara = originalRange.paragraphs.items[0];
+        if (thisPara.style == "Character"){
+            thisPara.select();
+            var charName = thisPara.text;
+            console.log("The selected para uses the Character style." + charName);
+            return charName;
+        }
+        else {
+            // Look back up the paras until we find a Character style
+            while (true){
+                thisPara = thisPara.getPreviousOrNullObject();
+                thisPara.load("text, style");
+                await context.sync();
+                if(thisPara.isNullObject){
+                    console.log("No previous paragraph uses the Character style.")
+                    return "Nobody";
+                } 
+                if(thisPara.style == "Character"){
+                    console.log("Found a Character style. The text is " + thisPara.text);
+                    return thisPara.text;
+                }
+            }
+            
+        };
+    });
+}
+
+async function getSpeaker() {
+    console.log("In getSpeaker -- about to await getSpeakerName.")
+    const speakerName = await getSpeakerName();
+    var deleteMe = speakerName;
+}

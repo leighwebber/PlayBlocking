@@ -217,7 +217,7 @@ async function replaceContentInControl() {
 }
 
 async function getSpeakerName(){
-    await Word.run(async (context) => {
+    return await Word.run(async (context) => {
         const doc = context.document;
         const originalRange = doc.getSelection();
         originalRange.load("paragraphs, style");
@@ -244,7 +244,6 @@ async function getSpeakerName(){
                     return thisPara.text;
                 }
             }
-            
         };
     });
 }

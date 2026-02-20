@@ -44,7 +44,7 @@ async function getCharacters(){
         const docBody = context.document.body;
         const paragraphs = docBody.paragraphs.load('style, text');
 
-        const targetStyleName = "Character";
+        const targetStyleName = "Speaker";
         const foundParagraphs = [];
         await context.sync();
         // Loop through the paragraphs to find those with the specific style
@@ -223,24 +223,24 @@ async function getSpeakerName(){
         originalRange.load("paragraphs, style");
         await context.sync();
         var thisPara = originalRange.paragraphs.items[0];
-        if (thisPara.style == "Character"){
+        if (thisPara.style == "Speaker"){
             thisPara.select();
             var charName = thisPara.text;
-            console.log("The selected para uses the Character style." + charName);
+            console.log("The selected para uses the Speaker style." + charName);
             return charName;
         }
         else {
-            // Look back up the paras until we find a Character style
+            // Look back up the paras until we find a Speaker style
             while (true){
                 thisPara = thisPara.getPreviousOrNullObject();
                 thisPara.load("text, style");
                 await context.sync();
                 if(thisPara.isNullObject){
-                    console.log("No previous paragraph uses the Character style.")
+                    console.log("No previous paragraph uses the Speaker style.")
                     return "Nobody";
                 } 
-                if(thisPara.style == "Character"){
-                    console.log("Found a Character style. The text is " + thisPara.text);
+                if(thisPara.style == "Speaker"){
+                    console.log("Found a Speaker style. The text is " + thisPara.text);
                     return thisPara.text;
                 }
             }
@@ -250,7 +250,8 @@ async function getSpeakerName(){
 }
 
 async function getSpeaker() {
+    debugger;
     console.log("In getSpeaker -- about to await getSpeakerName.")
     const speakerName = await getSpeakerName();
-    var deleteMe = speakerName;
+    console.log("The speaker's name is " + speakerName);
 }

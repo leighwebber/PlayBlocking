@@ -1,4 +1,3 @@
-// import { dialog } from './taskpane.js';
 var dialog = null;
 async function insertParagraph() {
     await Word.run(async (context) => {

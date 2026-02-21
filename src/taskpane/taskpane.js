@@ -4,9 +4,9 @@
  */
 
 /* global document, Office, Word */
-import { base64Image } from "../../base64Image";
+import { base64Image } from "../../base64Image.js";
 import { processMessage, openDialog, tryCatch, insertIcon,
-    insertParagraph, getSelectionText, insertStageDiagram } from './taskpaneFunctions';
+    insertParagraph, getSelectionText, insertStageDiagram } from './taskpaneFunctions.js';
 
 // export var dialog = 'Hello from another file!';
 // console.log("Set dialog to null");

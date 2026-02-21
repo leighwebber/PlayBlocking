@@ -1,7 +1,9 @@
 var stageImageSource;
 var stageImage;
 var fromLoad = false;
-// debugger;
+
+// import { iconCreate } from "../movements/movements.js"; 
+
 Office.onReady((info) => {
     Office.context.ui.addHandlerAsync(
         Office.EventType.DialogParentMessageReceived,
@@ -17,7 +19,25 @@ Office.onReady((info) => {
     });
     fromLoad = false;
 });
+function testButton(){
+    debugger;
+    const flexContainer = document.getElementById("flex-container");
+    const flexPanelUpper = document.getElementById("flex-panel-upper");
+    const flexPanelLower = document.getElementById("flex-panel-lower");
+    const myCanvas = document.getElementById("stage-diagram");
+    console.log("flexPanelUpper.clientHeight: " + flexPanelUpper.clientHeight);
+    console.log("myCanvas.height: " + myCanvas.height);
+    console.log("flexContainer.height: " + flexContainer.height);
+    const infoDiv = document.getElementById("info");
 
+    infoDiv.innerText += "flexPanelUpper.clientHeight: " + flexPanelUpper.clientHeight +
+        "  window height: " + window.innerHeight + 
+        "  flexPanelUpper.clientWidth: " + flexPanelUpper.clientWidth +
+        "  window width: " + window.innerWidth + "\n";
+    var icon = iconCreate("WG", "blue", "normal");
+    infoDiv.innerText += "Icon initials: " + icon.initials + "\n";
+
+    }
 function sendStringToParentPage() {
     const userName = document.getElementById("name-box").value;
     Office.context.ui.messageParent(userName);
@@ -97,19 +117,7 @@ function calculateAspectRatioFit(widthNative, heightNative, widthWindow, heightW
             break;
         };
 }
-function testButton(){
-    // debugger;
-    const flexContainer = document.getElementById("flex-container");
-    const flexPanelUpper = document.getElementById("flex-panel-upper");
-    const flexPanelLower = document.getElementById("flex-panel-lower");
-    const myCanvas = document.getElementById("stage-diagram");
-    console.log("flexPanelUpper.clientHeight: " + flexPanelUpper.clientHeight);
-    console.log("myCanvas.height: " + myCanvas.height);
-    console.log("flexContainer.height: " + flexContainer.height);
-    const infoDiv = document.getElementById("info");
-    infoDiv.innerText = "flexPanelUpper.clientHeight: " + flexPanelUpper.clientHeight + 
-        "  flexPanelUpper.clientWidth: " + flexPanelUpper.clientWidth;
-}
+
 function drawStageImage(){
     if(fromLoad) return;
     if(stageImage){
@@ -152,4 +160,32 @@ function onRegisterMessageComplete(asyncResult) {
         // reportError(asyncResult.error.message);
         console.log("ERROR: " + asyncResult.error.message);
     }
+}
+
+const icon = {};
+Object.defineProperty(icon, "initials", {
+value: "--",
+writable: true,
+enumerable: true,
+configurable: false,   
+});
+Object.defineProperty(icon, "colour", {
+    value: "black",
+    writable: true,
+    enumerable: true,
+    configurable: false,   
+});
+// An icon's state can be normal, disabled, or ghosted
+Object.defineProperty(icon, "state", {
+    value: "normal",
+    writable: true,
+    enumerable: true,
+    configurable: false,   
+});
+
+function iconCreate(initials, colour, state){
+    icon.initials = initials;
+    icon.colour = colour;
+    icon.state = state;
+    return icon;
 }

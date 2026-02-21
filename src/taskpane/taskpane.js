@@ -5,17 +5,22 @@
 
 /* global document, Office, Word */
 import { base64Image } from "../../base64Image";
+import { processMessage, openDialog, tryCatch, insertIcon,
+    insertParagraph, getSelectionText, insertStageDiagram } from './taskpaneFunctions';
 
+// export var dialog = 'Hello from another file!';
+// console.log("Set dialog to null");
 Office.onReady((info) => {
   if (info.host === Office.HostType.Word) {
     // Assign event handlers and other initialization logic.
     // document.getElementById("insert-paragraph").onclick = () => tryCatch(insertParagraph);
-    document.getElementById("open-stage-window").onclick = () => tryCatch(openStageWindow);
+    debugger;
+    document.getElementById("open-stage-window").onclick = () => tryCatch(openDialog);
     document.getElementById("get-characters").onclick = () => tryCatch(getCharacters);
     document.getElementById("get-speaker").onclick = () => tryCatch(getSpeaker);
     document.getElementById("insert-content-control").onclick = () => tryCatch(insertContentControl);
     document.getElementById("get-content-control").onclick = () => tryCatch(getContentControl);
-    
+    document.getElementById ("insert-stage-diagram").onclick = () => tryCatch(insertStageDiagram);
 /*     document.getElementById("apply-style").onclick = () => tryCatch(applyStyle);
     document.getElementById("apply-custom-style").onclick = () => tryCatch(applyCustomStyle);
     document.getElementById("change-font").onclick = () => tryCatch(changeFont);
@@ -32,7 +37,8 @@ Office.onReady((info) => {
   }
 });
 
-async function insertParagraph() {
+
+/* async function insertParagraph() {
     await Word.run(async (context) => {
 
         // TODO1: Queue commands to insert a paragraph into the document.
@@ -41,7 +47,9 @@ async function insertParagraph() {
                     Word.InsertLocation.start);
         await context.sync();
     });
-}
+} */
+
+
 
 async function getCharacters(){
     await Word.run(async (context) => {
@@ -64,7 +72,7 @@ async function getCharacters(){
 // Random change to permit me to push to github
 
 /** Default helper for invoking an action and handling errors. */
-async function tryCatch(callback) {
+/* async function tryCatch(callback) {
     try {
         await callback();
     } catch (error) {
@@ -72,7 +80,7 @@ async function tryCatch(callback) {
         console.error(error);
     }
 }
-
+ */
 async function applyStyle() {
     await Word.run(async (context) => {
 
@@ -196,7 +204,7 @@ async function insertTable() {
 
 async function createContentControl() {
     await Word.run(async (context) => {
-
+        debugger;
         // TODO1: Queue commands to create a content control.
         // User must first select the text that is to become the content control
         const serviceNameRange = context.document.getSelection();
@@ -329,19 +337,17 @@ let stageWindow;
       } else {
         stageWindow = asyncResult.value;
         // Add event handlers, e.g., for messages or closure events
-        stageWindow.addEventHandler(Office.EventType.DialogMessageReceived, processMessage);
+        // stageWindow.addEventHandler(Office.EventType.DialogEventReceived, processDialogMessage);
+        stageWindow.addEventHandler(Office.EventType.DialogMessageReceived, processDialogMessage);
       }
     }
   );
 } */
 
-function openStageWindow() {
-    Office.context.ui.displayDialogAsync("https://localhost:3000/stagewindow.html", { height: 30, width: 20 },
-    (asyncResult) => {
-        const dialog = asyncResult.value;
-        dialog.addEventHandler(Office.EventType.DialogMessageReceived, (arg) => {
-            dialog.close();
-            // Do something to process the message.
-        });
-    });
-}
+// Function to process messages received from the dialog
+/* function processDialogMessage(arg) {
+    debugger;
+    const messageFromDialog = JSON.parse(arg.message);
+    // Use the message data in your task pane
+    console.log("Received data from dialog:", messageFromDialog);
+} */

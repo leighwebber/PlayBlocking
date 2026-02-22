@@ -24,10 +24,7 @@ function testButton(){
     const flexContainer = document.getElementById("flex-container");
     const flexPanelUpper = document.getElementById("flex-panel-upper");
     const flexPanelLower = document.getElementById("flex-panel-lower");
-    const myCanvas = document.getElementById("stage-diagram");
-    console.log("flexPanelUpper.clientHeight: " + flexPanelUpper.clientHeight);
-    console.log("myCanvas.height: " + myCanvas.height);
-    console.log("flexContainer.height: " + flexContainer.height);
+    const stageImage = document.getElementById("stage-image");
     const infoDiv = document.getElementById("info");
 
     infoDiv.innerText += "flexPanelUpper.clientHeight: " + flexPanelUpper.clientHeight +
@@ -78,7 +75,7 @@ function calculateAspectRatioFit(widthNative, heightNative, widthWindow, heightW
     return({width: widthCanvas, height: heightCanvas});
  }
  function onMessageFromParent(arg) {
-    debugger;
+    // debugger;
     const messageFromParent = JSON.parse(arg.message);
     document.getElementById("testButton").onclick = () => tryCatch(testButton);
     switch(messageFromParent.messageType){
@@ -100,60 +97,71 @@ function calculateAspectRatioFit(widthNative, heightNative, widthWindow, heightW
             document.body.appendChild(newButton);
             break;
         case "imageLoad":
-            
-            /* const myCanvas = document.getElementById("stage-diagram");
-            const ctx = myCanvas.getContext("2d"); */
-            // const stageImage = new Image();
-            stageImage = new Image();
+            /* stageImage = new Image();
             stageImage.onload = function(){
-                // debugger;
                 drawStageImage();
-                // ctx.drawImage(stageImage, 0, 0); // draw at position 0, 0
             }
-            // debugger;
             stageImageSource = messageFromParent.src;
             stageImage.src = stageImageSource;
-            drawStageImage();
+            drawStageImage(); */
+            debugger;
+
+            var img = new Image();
+            img.id = "stage-image";
+            img.className = "stageImage";
+            img.alt = "Stage image";
+            img.onload = function() {
+                drawStageImage(img); 
+            }
+            img.src = messageFromParent.src;
+            // var stageImage = document.getElementById("stage-image");
+            // stageImage.src = messageFromParent.src;
+            
+            // drawStageImage(stageImage);
             break;
         };
 }
 
-function drawStageImage(){
-    if(fromLoad) return;
-    if(stageImage){
-        // debugger;
+
+function drawStageImage(stageImage){
+    // if(fromLoad) return;
+    // if(stageImage){
+        debugger;
         const flexContainer = document.getElementById("flex-container");
         const flexPanelUpper = document.getElementById("flex-panel-upper");
         const flexPanelLower = document.getElementById("flex-panel-lower");
-        const myCanvas = document.getElementById("stage-diagram");
-        const ctx = myCanvas.getContext("2d");
+
+        // var stageImageElement = document.getElementById("stage-image");
+        // stageImage.src = src;
+
+        // const stageImage = document.getElementById("stage-image");
+        // const ctx = myCanvas.getContext("2d");
+        
         // myCanvas.width = window.innerWidth;
-        myCanvas.width = flexPanelUpper.clientWidth;
+        // myCanvas.width = flexPanelUpper.clientWidth;
+        stageImage.width = flexPanelUpper.clientWidth;
         // myCanvas.height = window.innerHeight - 100;
-        myCanvas.height = flexPanelUpper.clientHeight;
+        // myCanvas.height = flexPanelUpper.clientHeight;
+        stageImage.height = flexPanelUpper.clientHeight;
+        
 
         var naturalWidth = stageImage.naturalWidth;
         var naturalHeight = stageImage.naturalHeight;
         var newSize = calculateAspectRatioFit(naturalWidth, naturalHeight, 
             flexPanelUpper.clientWidth, flexPanelUpper.clientHeight);
         // debugger;
-        ctx.clearRect(0, 0, myCanvas.width, myCanvas.height);
-        myCanvas.width = newSize.width;
-        myCanvas.height = newSize.height;
-        ctx.drawImage(stageImage, 0, 0, 
-            newSize.width, newSize.height);
+        // ctx.clearRect(0, 0, myCanvas.width, myCanvas.height);
+        // myCanvas.width = newSize.width;
+        stageImage.width = newSize.width;
+        // myCanvas.height = newSize.height;
+        stageImage.height = newSize.height;
+
+        /* ctx.drawImage(stageImage, 0, 0, 
+            newSize.width, newSize.height); */
         flexPanelUpper.clientHeight = newSize.height;
         flexPanelUpper.clientWidth = newSize.width;
-/*         console.log("fc.offH: " + flexContainer.offsetHeight.toString() +
-            "  fpU.H: " + flexPanelUpper.offsetHeight.toString() +
-            "  fpU.W: " + flexPanelUpper.offsetWidth.toString() +
-            "  mCW: " + myCanvas.width.toString() +
-            "  mcH: " + myCanvas.height.toString() +
-            "  nsW: " + newSize.width.toString() +
-            "  nsH: " + newSize.height.toString()
-        );
-        console.log(" ");
- */    };
+        flexPanelUpper.append(stageImage);
+    // };
 }
 function onRegisterMessageComplete(asyncResult) {
     if (asyncResult.status !== Office.AsyncResultStatus.Succeeded) {

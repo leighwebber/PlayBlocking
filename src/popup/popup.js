@@ -34,7 +34,7 @@ function testButton(){
         "  window height: " + window.innerHeight + 
         "  flexPanelUpper.clientWidth: " + flexPanelUpper.clientWidth +
         "  window width: " + window.innerWidth + "\n";
-    var icon = iconCreate("WG", "blue", "normal");
+    var icon = iconCreate("WG", 25, "blue", "normal");
     infoDiv.innerText += "Icon initials: " + icon.initials + "\n";
 
     }
@@ -182,9 +182,17 @@ Object.defineProperty(icon, "state", {
     enumerable: true,
     configurable: false,   
 });
+// diameter in pixels
+Object.defineProperty(icon, "diameter", {
+    value: 20,
+    writable: true,
+    enumerable: true,
+    configurable: false,   
+});
 
-function iconCreate(initials, colour, state){
+function iconCreate(initials, diameter, colour, state){
     icon.initials = initials;
+    icon.diameter = diameter;
     icon.colour = colour;
     icon.state = state;
     return icon;

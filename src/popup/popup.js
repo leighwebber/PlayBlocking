@@ -22,6 +22,7 @@ Office.onReady((info) => {
 });
 function testButton(){
     debugger;
+    var fooText = foo();
     const flexContainer = document.getElementById ("flex-container");
     const flexPanelUpper = document.getElementById("flex-panel-upper");
     const flexPanelLower = document.getElementById("flex-panel-lower");

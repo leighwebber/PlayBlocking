@@ -1,4 +1,6 @@
 var dialog = null;
+var dialogOpened = false;
+
 async function insertParagraph() {
     await Word.run(async (context) => {
 
@@ -22,19 +24,38 @@ async function insertIcon() {
         }
     });
 }
-/* async function insertStageDiagram() {
-    await Word.run(async (context) => {
-        if(dialog){
-            debugger;
-            var jsonMessage = JSON.stringify(messageObject);
-            dialog.messageChild(jsonMessage);
-            const messageObject = { messageType: "imageLoad", src: "../../assets/AnneFrankSet.jpg"};
-            const jsonMessage = JSON.stringify(messageObject);
-            dialog.messageChild(jsonMessage);
-        }
-    });
-} */
 
+function openDialog() {
+    Office.context.ui.displayDialogAsync("https://localhost:3000/popup.html", { height: 45, width: 55 },
+    (asyncResult) => {
+        dialog = asyncResult.value;
+        dialogOpened = true;
+        dialog.addEventHandler(Office.EventType.DialogMessageReceived, (arg) => {
+            // dialog.close();
+            processMessage(arg);
+        });
+    });
+}
+function processMessage(arg) {
+    debugger;
+    var message = JSON.parse(arg);
+    switch(message.messageType){
+        case "userName":
+            console.log(arg.userName);
+            break;
+        case "popupData":
+            var popupDataJason = JSON.stringify(arg.popupData);
+            console.log(popupDataJason);
+            break;
+    }
+}
+
+function onRegisterMessageComplete(asyncResult) {
+    if (asyncResult.status === Office.AsyncResultStatus.Failed) {
+        console.log(asyncResult.error.message);
+        return;
+    }
+}
 /** Default helper for invoking an action and handling errors. */
 async function tryCatch(callback) {
     try {
@@ -46,36 +67,19 @@ async function tryCatch(callback) {
 }
 async function insertStageDiagram() {
     await Word.run(async (context) => {
-        debugger;
-        if(dialog){
+        // debugger;
+        if(dialogOpened){
             /* const messageObject = { messageType: "sillyStuff", text: "Hello there"};
             var jsonMessage = JSON.stringify(messageObject);
             dialog.messageChild(jsonMessage); */
-            debugger;
+            // debugger;
             const messageObject = { messageType: "imageLoad", src: "../../assets/AnneFrankSet.jpg"};
             const jsonMessage = JSON.stringify(messageObject);
             dialog.messageChild(jsonMessage);
         }
     });
 }
-function openDialog() {
-    debugger;
-    Office.context.ui.displayDialogAsync(
-    'https://localhost:3000/popup.html',
-    {height: 45, width: 55},
 
-      function (result) {
-        debugger;
-        dialog = result.value;
-        dialog.addEventHandler(Office.EventType.DialogMessageReceived, processMessage);
-    }
-  );
-}
-
-function processMessage(arg) {
-    document.getElementById("user-name").innerHTML = arg.message;
-    // dialog.close();
-}
 
 async function getSelectionText() {
     await Word.run(async (context) => {
@@ -88,5 +92,5 @@ async function getSelectionText() {
         
     });
 }
-export { processMessage, openDialog, tryCatch, insertIcon,
+export { openDialog, tryCatch, insertIcon,
     insertParagraph, getSelectionText, insertStageDiagram }

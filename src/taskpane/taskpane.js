@@ -5,8 +5,9 @@
 
 /* global document, Office, Word */
 import { base64Image } from "../../base64Image.js";
-import { processMessage, openDialog, tryCatch, insertIcon,
+import { openDialog, tryCatch, insertIcon,
     insertParagraph, getSelectionText, insertStageDiagram } from './taskpaneFunctions.js';
+
 
 // export var dialog = 'Hello from another file!';
 // console.log("Set dialog to null");
@@ -15,6 +16,11 @@ Office.onReady((info) => {
     // Assign event handlers and other initialization logic.
     // document.getElementById("insert-paragraph").onclick = () => tryCatch(insertParagraph);
     debugger;
+    Office.context.ui.addHandlerAsync(
+        Office.EventType.DialogParentMessageReceived,
+        onMessageFromParent,
+        onRegisterMessageComplete
+    );
     document.getElementById("open-stage-window").onclick = () => tryCatch(openDialog);
     document.getElementById("get-characters").onclick = () => tryCatch(getCharacters);
     document.getElementById("get-speaker").onclick = () => tryCatch(getSpeaker);
@@ -38,16 +44,8 @@ Office.onReady((info) => {
 });
 
 
-/* async function insertParagraph() {
-    await Word.run(async (context) => {
 
-        // TODO1: Queue commands to insert a paragraph into the document.
-        const docBody = context.document.body;
-        docBody.insertParagraph("Office has several versions, including Office 2021, Microsoft 365 subscription, and Office on the web.",
-                    Word.InsertLocation.start);
-        await context.sync();
-    });
-} */
+
 
 
 

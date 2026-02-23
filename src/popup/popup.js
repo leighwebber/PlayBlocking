@@ -1,8 +1,9 @@
 var stageImageSource;
 var stageImage;
 var fromLoad = false;
+var popupData;
 
-// import { iconCreate } from "../movements/movements.js"; 
+// const popupData = new PopupData(null, null, null, null);
 
 Office.onReady((info) => {
     Office.context.ui.addHandlerAsync(
@@ -10,7 +11,8 @@ Office.onReady((info) => {
         onMessageFromParent,
         onRegisterMessageComplete
     );
-    debugger;
+    // debugger;
+    popupData = new PopupData(null, null, null, []);
     document.getElementById("testButton").onclick = () => tryCatch(testButton);
     fromLoad = true;
     window.addEventListener('resize', (event) => {
@@ -18,11 +20,26 @@ Office.onReady((info) => {
         const stageImage = document.getElementById("stage-image");
         drawStageImage(stageImage);
     });
+    window.addEventListener("beforeunload", function(e) {
+        // Perform actions like sending an analytics request
+        console.log("Page is about to unload. Performing final actions.");
+        popupData.saveToParent();
+    });
+    document.addEventListener("click", function(event) {
+        const xPos = event.clientX; // X coordinate relative to the viewport
+        const yPos = event.clientY; // Y coordinate relative to the viewport
+        const stageImage = document.getElementById("stage-image");
+        const xRel = (xPos - stageImage.x) / stageImage.width;
+        const yRel = (yPos - stageImage.y) / stageImage.height;
+        console.log("Mouse clicked at X:", xPos, "Y:", yPos, "stageImage.x", stageImage.x,
+            "stageImage.y", stageImage.y, "stageImage.width", stageImage.width, 
+            "stageImage.height", stageImage.height, "xRel", xRel, "yRel", yRel);
+    });
     fromLoad = false;
 });
 function testButton(){
-    debugger;
-    var fooText = foo();
+    // debugger;
+    sendStringToParentPage("userName", "Leigh");
     const flexContainer = document.getElementById ("flex-container");
     const flexPanelUpper = document.getElementById("flex-panel-upper");
     const flexPanelLower = document.getElementById("flex-panel-lower");
@@ -33,14 +50,22 @@ function testButton(){
         "  window height: " + window.innerHeight + 
         "  flexPanelUpper.clientWidth: " + flexPanelUpper.clientWidth +
         "  window width: " + window.innerWidth + "\n";
-    var icon = iconCreate("WG", 25, "blue", "normal");
+    const icon = new Icon("WG", 20, "blue", "normal");
+    popupData.iconCollection.push(icon);
+    icon.place("Foo place");
     infoDiv.innerText += "Icon initials: " + icon.initials + "\n";
 
     }
-function sendStringToParentPage() {
-    const userName = document.getElementById("name-box").value;
-    Office.context.ui.messageParent(userName);
+function sendStringToParentPage(text) {
+    // debugger;
+    var message = {
+        messageType: "userName",
+        userName: text
+    }
+    var messageJson = JSON.stringify(message)
+    Office.context.ui.messageParent(messageJson);
 }
+
 
 /** Default helper for invoking an action and handling errors. */
 async function tryCatch(callback) {
@@ -98,6 +123,11 @@ function calculateAspectRatioFit(widthNative, heightNative, widthWindow, heightW
             newButton.style.height = "20px";
             document.body.appendChild(newButton);
             break;
+        case "popupData":
+            popupData.flexPanelClientHeight = messageFromParent.popupData.flexPanelClientHeight;
+            popupData.flexPanelClientWidth = messageFromParent.popupData.flexPanelClientWidth;
+            popupData.iconCollection = messageFromParent.popupData.iconCollection;
+            popupData.imageSrc = messageFromParent.popupData.imageSrc;
         case "imageLoad":
             /* stageImage = new Image();
             stageImage.onload = function(){
@@ -106,7 +136,7 @@ function calculateAspectRatioFit(widthNative, heightNative, widthWindow, heightW
             stageImageSource = messageFromParent.src;
             stageImage.src = stageImageSource;
             drawStageImage(); */
-            debugger;
+            // debugger;
 
             var img = new Image();
             img.id = "stage-image";
@@ -118,17 +148,16 @@ function calculateAspectRatioFit(widthNative, heightNative, widthWindow, heightW
             img.src = messageFromParent.src;
             // var stageImage = document.getElementById("stage-image");
             // stageImage.src = messageFromParent.src;
-            
+            popupData.image = img;
             // drawStageImage(stageImage);
             break;
         };
 }
 
-
 function drawStageImage(stageImage){
     // if(fromLoad) return;
     // if(stageImage){
-        debugger;
+        // debugger;
         const flexContainer = document.getElementById("flex-container");
         const flexPanelUpper = document.getElementById("flex-panel-upper");
         const flexPanelLower = document.getElementById("flex-panel-lower");
@@ -163,6 +192,7 @@ function drawStageImage(stageImage){
         flexPanelUpper.clientHeight = newSize.height;
         flexPanelUpper.clientWidth = newSize.width;
         flexPanelUpper.append(stageImage);
+        popupData.image = stageImage;
     // };
 }
 function onRegisterMessageComplete(asyncResult) {
@@ -172,13 +202,14 @@ function onRegisterMessageComplete(asyncResult) {
     }
 }
 
-const icon = {};
+/* const icon = {};
 Object.defineProperty(icon, "initials", {
 value: "--",
 writable: true,
 enumerable: true,
 configurable: false,   
 });
+
 Object.defineProperty(icon, "colour", {
     value: "black",
     writable: true,
@@ -199,11 +230,55 @@ Object.defineProperty(icon, "diameter", {
     enumerable: true,
     configurable: false,   
 });
+*/
 
+/*
 function iconCreate(initials, diameter, colour, state){
+    const icon = {
+        initials: initials,
+        diameter: diameter,
+        colour: colour,
+        state: state,
+        place: function(params){
+            console.log(params);
+        }
+    }
     icon.initials = initials;
     icon.diameter = diameter;
     icon.colour = colour;
     icon.state = state;
+    icon.place = function(params){
+        console.log(params);
+    }
     return icon;
+} */
+class Icon {
+    constructor(initials, diameter, colour, state){
+        this.initials = initials;
+        this.diameter = diameter;
+        this.colour = colour;
+        this.state = state;
+        this.xRel = 0;
+        this.yRel = 0;
+        this.iconCollection = [];
+    }
+    place(params) {
+        console.log(params);
+    }
+}
+class PopupData {
+    constructor(image, flexPanelClientWidth, flexPanelClientHeight, iconCollection) {
+        this.image = image;
+        this.flexPanelClientWidth = flexPanelClientWidth;
+        this.flexPanelClientHeight = flexPanelClientHeight;
+        this.iconCollection = iconCollection;
+    }
+    saveToParent() {
+        var message = {
+            messageType: "popData",
+            popupData: JSON.stringify(this)
+        }
+        Office.context.ui.messageParent(message);
+    }
+
 }

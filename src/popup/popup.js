@@ -21,7 +21,7 @@ Office.onReady((info) => {
 });
 function testButton(){
     debugger;
-    const flexContainer = document.getElementById("flex-container");
+    const flexContainer = document.getElementById ("flex-container");
     const flexPanelUpper = document.getElementById("flex-panel-upper");
     const flexPanelLower = document.getElementById("flex-panel-lower");
     const stageImage = document.getElementById("stage-image");

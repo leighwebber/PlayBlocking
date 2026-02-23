@@ -15,7 +15,8 @@ Office.onReady((info) => {
     fromLoad = true;
     window.addEventListener('resize', (event) => {
         // debugger;
-        drawStageImage();
+        const stageImage = document.getElementById("stage-image");
+        drawStageImage(stageImage);
     });
     fromLoad = false;
 });
